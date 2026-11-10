@@ -155,8 +155,8 @@ def main():
                [('SB_URL', SB_URL), ('SB_KEY', SB_KEY), ('PROBE_URL', PROBE_URL)]
                if not v]
     if missing or not SOURCES:
-        log('missing configuration: %s' % (','.join(missing) or 'SOURCES'))
-        return 1
+        log('configuration not ready, skipping this round')
+        return 0
     t0 = time.time()
     candidates = fetch_feeds()
     if not candidates:
