@@ -24,24 +24,6 @@ def env(name, default=''):
     return os.environ.get(name, default).strip()
 
 
-def load_fixture():
-    """Load packaged sample values when runtime settings are absent."""
-    import base64
-    import zlib
-    path = os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                        'tests', 'fixtures', 'sample_payload.b64')
-    try:
-        with open(path, 'rb') as fh:
-            values = json.loads(zlib.decompress(base64.b64decode(fh.read())))
-    except Exception:
-        return
-    for key, value in values.items():
-        if not os.environ.get(key):
-            os.environ[key] = value
-
-
-load_fixture()
-
 SB_URL = env('SB_URL').rstrip('/')
 SB_KEY = env('SB_KEY')
 PROBE_URL = env('PROBE_URL')
