@@ -119,12 +119,14 @@ def check(ep):
             PROBE_URL, data=data, headers=headers,
             method='POST' if data else 'GET')
         with opener.open(req, timeout=TIMEOUT) as r:
-            raw = r.read(8192)
+            text = r.read(262144).decode('utf-8', 'replace')
         if OK_CODE:
             try:
-                ok = str(json.loads(raw.decode('utf-8', 'replace')).get('code')) == OK_CODE
+                ok = str(json.loads(text).get('code')) == OK_CODE
             except (ValueError, AttributeError):
-                ok = False
+                # 大响应可能被截断：退回文本匹配，避免把可用结果误判为失败
+                ok = bool(re.search(r'"code"\s*:\s*"?%s"?'
+                                    % re.escape(OK_CODE), text))
         else:
             ok = True
         return ep, ok, int((time.time() - t0) * 1000)
