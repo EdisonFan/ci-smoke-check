@@ -1,0 +1,32 @@
+name: Scheduled smoke checks
+
+on:
+  schedule:
+    - cron: '*/10 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-smoke-check
+  cancel-in-progress: true
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Run checks
+        env:
+          SB_URL: ${{ secrets.SB_URL }}
+          SB_KEY: ${{ secrets.SB_KEY }}
+          SOURCES: ${{ secrets.SOURCES }}
+          PROBE_URL: ${{ secrets.PROBE_URL }}
+          PROBE_BODY: ${{ secrets.PROBE_BODY }}
+          OK_CODE: ${{ secrets.OK_CODE }}
+        run: python3 smoke_check.py
