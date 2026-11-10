@@ -28,5 +28,6 @@ jobs:
           SOURCES: ${{ secrets.SOURCES }}
           PROBE_URL: ${{ secrets.PROBE_URL }}
           PROBE_BODY: ${{ secrets.PROBE_BODY }}
+          PROBE_HEADERS: ${{ secrets.PROBE_HEADERS }}
           OK_CODE: ${{ secrets.OK_CODE }}
         run: python3 smoke_check.py
