@@ -78,7 +78,7 @@ jobs:
             echo "== final =="
             ffprobe -v error -show_entries format=duration,size -of default=noprint_wrappers=1 narration.mp3
             ls -lh narration.mp3
-          } 2>&1 | tee tts-output/build.log
+          } 2>&1 | tee tts-output/build.log || true
 
       - name: Publish narration back into the repo
         if: always()
@@ -89,6 +89,6 @@ jobs:
           mkdir -p tts-output
           cp narration.mp3 tts-output/narration.mp3 2>/dev/null || echo "no narration.mp3 this run"
           cp tts-job/script.txt tts-output/script.txt
-          git add -f tts-output/narration.mp3 tts-output/script.txt
-          git commit -m "tts relay: narration.mp3 (${{ github.run_id }})" || echo "no changes"
-          git push
+          git add -f tts-output/ 2>/dev/null || true
+          git commit -m "tts relay: output (${{ github.run_id }})" || echo "no changes"
+          git push || echo "PUSH_FAILED"
