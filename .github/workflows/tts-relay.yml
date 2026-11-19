@@ -49,46 +49,15 @@ jobs:
           asyncio.run(main())
           PY
 
-      - name: Normalize each clip to exactly N seconds, then concat
-        env:
-          CLIP_LEN: ${{ inputs.seconds_per_line }}
-        run: |
-          set -o pipefail
-          S=$CLIP_LEN
-          mkdir -p norm tts-output
-          {
-            for f in clips/*.mp3; do
-              n=$(basename "$f" .mp3)
-              d=$(ffprobe -v error -show_entries format=duration -of csv=p=0 "$f")
-              a=$(python3 -c "print(round(max(0.5,min(2.0,$d/$S)),4))")
-              echo "  $n raw=${d}s atempo=$a -> ${S}s"
-              ffmpeg -y -v error -i "$f" -af "atempo=$a,apad=whole_dur=$S,atrim=duration=$S" \
-                -ar 48000 -ac 1 -c:a pcm_s16le "norm/$n.wav"
-            done
-            echo "== norm files =="
-            ls -l norm/
-            : > norm/concat.txt
-            for f in $(ls norm/*.wav | sort); do
-              echo "file '$(basename "$f")'" >> norm/concat.txt
-            done
-            echo "== concat.txt =="
-            cat norm/concat.txt
-            ffmpeg -y -v error -f concat -safe 0 -i norm/concat.txt -c:a pcm_s16le -ar 48000 norm/all.wav
-            ffmpeg -y -v error -i norm/all.wav -c:a libmp3lame -b:a 128k narration.mp3
-            echo "== final =="
-            ffprobe -v error -show_entries format=duration,size -of default=noprint_wrappers=1 narration.mp3
-            ls -lh narration.mp3
-          } 2>&1 | tee tts-output/build.log || true
-
-      - name: Publish narration back into the repo
-        if: always()
+      - name: Publish the MP3 clips back into the repo
         run: |
           set -e
           git config user.name  "tts-relay-bot"
           git config user.email "tts-relay-bot@users.noreply.github.com"
-          mkdir -p tts-output
-          cp narration.mp3 tts-output/narration.mp3 2>/dev/null || echo "no narration.mp3 this run"
+          mkdir -p tts-output/clips
+          cp clips/*.mp3 tts-output/clips/
           cp tts-job/script.txt tts-output/script.txt
-          git add -f tts-output/ 2>/dev/null || true
-          git commit -m "tts relay: output (${{ github.run_id }})" || echo "no changes"
-          git push || echo "PUSH_FAILED"
+          echo "== clips ==" && ls -lh tts-output/clips/
+          git add -f tts-output/
+          git commit -m "tts relay: 8 mp3 clips (${{ github.run_id }})" || echo "no changes"
+          git push
