@@ -1,0 +1,91 @@
+name: TTS narration relay
+on:
+  workflow_dispatch:
+    inputs:
+      seconds_per_line:
+        description: '每幕时长（秒），与视频时间轴对齐'
+        required: true
+        default: '6'
+      voice:
+        description: 'Edge TTS 中文声音'
+        required: true
+        default: 'zh-CN-YunxiNeural'
+      rate:
+        description: '基础语速，例如 +0% / +8%'
+        required: true
+        default: '+0%'
+jobs:
+  synth:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install edge-tts
+        run: pip install --quiet edge-tts
+
+      - name: Synthesize one clip per line
+        env:
+          VOICE: ${{ inputs.voice }}
+          RATE: ${{ inputs.rate }}
+        run: |
+          set -e
+          mkdir -p clips
+          python - <<'PY'
+          import asyncio, os
+          import edge_tts
+          lines = [l.strip() for l in open('tts-job/script.txt', encoding='utf-8') if l.strip()]
+          voice = os.environ['VOICE']; rate = os.environ['RATE']
+          print(f'{len(lines)} lines, voice={voice}, rate={rate}')
+          async def main():
+              for i, text in enumerate(lines, 1):
+                  out = f'clips/{i:02d}.mp3'
+                  await edge_tts.Communicate(text, voice, rate=rate).save(out)
+                  print(f'  {out}: {text}')
+          asyncio.run(main())
+          PY
+
+      - name: Normalize each clip to exactly N seconds, then concat
+        env:
+          SECONDS: ${{ inputs.seconds_per_line }}
+        run: |
+          set -e
+          S=$SECONDS
+          mkdir -p norm
+          for f in clips/*.mp3; do
+            n=$(basename "$f" .mp3)
+            d=$(ffprobe -v error -show_entries format=duration -of csv=p=0 "$f")
+            # atempo = 原时长 / 目标时长；超出 [0.5,2] 时链式串联
+            a=$(python3 -c "print(max(0.5,min(2.0,$d/$S)))" 2>/dev/null || echo 1)
+            # 转成统一 wav，微调速度后用 apad 补齐 / atrim 截断到恰好 S 秒
+            ffmpeg -y -v error -i "$f" -af "atempo=$a,apad=whole_dur=$S,atrim=duration=$S" \
+              -ar 48000 -ac 1 -c:a pcm_s16le "norm/$n.wav"
+            printf '  %s  raw=%ss atempo=%s -> %ss\n' "$n" "$d" "$a" "$S"
+          done
+          ls norm/*.wav | sort > norm/list.txt
+          python3 - <<'PY'
+          lines=[l.strip() for l in open('norm/list.txt')]
+          with open('norm/concat.txt','w') as f:
+              for p in lines: f.write(f"file '{p}'\n")
+          print('concat order:', lines)
+          PY
+          ffmpeg -y -v error -f concat -safe 0 -i norm/concat.txt -c:a pcm_s16le -ar 48000 norm/all.wav
+          ffmpeg -y -v error -i norm/all.wav -c:a libmp3lame -b:a 128k narration.mp3
+          ffprobe -v error -show_entries format=duration,size -of default=noprint_wrappers=1 narration.mp3
+          ls -lh narration.mp3
+
+      - name: Publish narration back into the repo
+        run: |
+          set -e
+          git config user.name  "tts-relay-bot"
+          git config user.email "tts-relay-bot@users.noreply.github.com"
+          mkdir -p tts-output
+          cp narration.mp3 tts-output/narration.mp3
+          cp tts-job/script.txt tts-output/script.txt
+          git add -f tts-output/narration.mp3 tts-output/script.txt
+          git commit -m "tts relay: narration.mp3 (${{ github.run_id }})" || echo "no changes"
+          git push
