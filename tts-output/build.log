@@ -1,0 +1,65 @@
+/home/runner/work/_temp/7a3ec3a4-1220-4953-9781-7b8537e57646.sh: line 7: ffprobe: command not found
+  File "<string>", line 1
+    print(round(max(0.5,min(2.0,/6)),4))
+                                ^
+SyntaxError: invalid syntax
+  01 raw=s atempo= -> 6s
+/home/runner/work/_temp/7a3ec3a4-1220-4953-9781-7b8537e57646.sh: line 10: ffmpeg: command not found
+/home/runner/work/_temp/7a3ec3a4-1220-4953-9781-7b8537e57646.sh: line 7: ffprobe: command not found
+  File "<string>", line 1
+    print(round(max(0.5,min(2.0,/6)),4))
+                                ^
+SyntaxError: invalid syntax
+  02 raw=s atempo= -> 6s
+/home/runner/work/_temp/7a3ec3a4-1220-4953-9781-7b8537e57646.sh: line 10: ffmpeg: command not found
+/home/runner/work/_temp/7a3ec3a4-1220-4953-9781-7b8537e57646.sh: line 7: ffprobe: command not found
+  File "<string>", line 1
+    print(round(max(0.5,min(2.0,/6)),4))
+                                ^
+SyntaxError: invalid syntax
+  03 raw=s atempo= -> 6s
+/home/runner/work/_temp/7a3ec3a4-1220-4953-9781-7b8537e57646.sh: line 10: ffmpeg: command not found
+/home/runner/work/_temp/7a3ec3a4-1220-4953-9781-7b8537e57646.sh: line 7: ffprobe: command not found
+  File "<string>", line 1
+    print(round(max(0.5,min(2.0,/6)),4))
+                                ^
+SyntaxError: invalid syntax
+  04 raw=s atempo= -> 6s
+/home/runner/work/_temp/7a3ec3a4-1220-4953-9781-7b8537e57646.sh: line 10: ffmpeg: command not found
+/home/runner/work/_temp/7a3ec3a4-1220-4953-9781-7b8537e57646.sh: line 7: ffprobe: command not found
+  File "<string>", line 1
+    print(round(max(0.5,min(2.0,/6)),4))
+                                ^
+SyntaxError: invalid syntax
+  05 raw=s atempo= -> 6s
+/home/runner/work/_temp/7a3ec3a4-1220-4953-9781-7b8537e57646.sh: line 10: ffmpeg: command not found
+/home/runner/work/_temp/7a3ec3a4-1220-4953-9781-7b8537e57646.sh: line 7: ffprobe: command not found
+  File "<string>", line 1
+    print(round(max(0.5,min(2.0,/6)),4))
+                                ^
+SyntaxError: invalid syntax
+  06 raw=s atempo= -> 6s
+/home/runner/work/_temp/7a3ec3a4-1220-4953-9781-7b8537e57646.sh: line 10: ffmpeg: command not found
+/home/runner/work/_temp/7a3ec3a4-1220-4953-9781-7b8537e57646.sh: line 7: ffprobe: command not found
+  File "<string>", line 1
+    print(round(max(0.5,min(2.0,/6)),4))
+                                ^
+SyntaxError: invalid syntax
+  07 raw=s atempo= -> 6s
+/home/runner/work/_temp/7a3ec3a4-1220-4953-9781-7b8537e57646.sh: line 10: ffmpeg: command not found
+/home/runner/work/_temp/7a3ec3a4-1220-4953-9781-7b8537e57646.sh: line 7: ffprobe: command not found
+  File "<string>", line 1
+    print(round(max(0.5,min(2.0,/6)),4))
+                                ^
+SyntaxError: invalid syntax
+  08 raw=s atempo= -> 6s
+/home/runner/work/_temp/7a3ec3a4-1220-4953-9781-7b8537e57646.sh: line 10: ffmpeg: command not found
+== norm files ==
+total 0
+ls: cannot access 'norm/*.wav': No such file or directory
+== concat.txt ==
+/home/runner/work/_temp/7a3ec3a4-1220-4953-9781-7b8537e57646.sh: line 21: ffmpeg: command not found
+/home/runner/work/_temp/7a3ec3a4-1220-4953-9781-7b8537e57646.sh: line 22: ffmpeg: command not found
+== final ==
+/home/runner/work/_temp/7a3ec3a4-1220-4953-9781-7b8537e57646.sh: line 24: ffprobe: command not found
+ls: cannot access 'narration.mp3': No such file or directory
